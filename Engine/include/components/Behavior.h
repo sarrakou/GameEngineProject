@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "Transform.h"
 #include <string>
+#include <vector>
 
 // Forward declarations
 class GameObject;
@@ -19,13 +20,13 @@ public:
 
     // Component interface
     void Update(float deltaTime) override final;
-    const char* GetTypeName() const override { return "Behavior"; }
+    std::string GetDisplayName() const override { return "Behavior Component"; }
 
-    // Behavior lifecycle methods - override these in derived classes
-    virtual void Start() {}          // Called once when first enabled
-    virtual void OnUpdate(float deltaTime) {}  // Called every frame
-    virtual void OnLateUpdate(float deltaTime) {}  // Called after all OnUpdate calls
-    virtual void OnFixedUpdate(float fixedDeltaTime) {}  // Called at fixed intervals (physics)
+    // Behavior lifecycle methods
+    virtual void Start() {}
+    virtual void OnUpdate(float deltaTime) {}
+    virtual void OnLateUpdate(float deltaTime) {}
+    virtual void OnFixedUpdate(float fixedDeltaTime) {}
 
     // Component lifecycle overrides
     void OnEnable() override;
@@ -33,14 +34,14 @@ public:
     void OnDestroy() override;
 
     // Common behavior functionality
-    Transform* GetTransform();  // Cached access to transform component
-    GameObject* GetGameObject() { return GetOwner(); }  // Alias for clarity
+    Transform* GetTransform();
+    GameObject* GetGameObject() { return GetOwner(); }
 
     // Time utilities
-    static float GetTime();      // Total time since engine start
-    static float GetDeltaTime(); // Time since last frame
+    static float GetTime();
+    static float GetDeltaTime();
 
-    // Input utilities (basic framework - can be expanded)
+    // Input utilities
     virtual void OnCollisionEnter(GameObject* other) {}
     virtual void OnCollisionStay(GameObject* other) {}
     virtual void OnCollisionExit(GameObject* other) {}
@@ -51,7 +52,8 @@ public:
     void LogError(const std::string& message) const;
 
 protected:
-    // Protected utilities that derived classes can use
+    // ===== DECLARE TEMPLATE METHODS (IMPLEMENT IN .cpp) =====
+
     template<typename T>
     T* FindObjectOfType() const;
 
@@ -61,22 +63,36 @@ protected:
     GameObject* FindGameObjectWithTag(const std::string& tag) const;
     std::vector<GameObject*> FindGameObjectsWithTag(const std::string& tag) const;
 
-    // Component shortcuts
+    // Component shortcuts - DECLARE ONLY
     template<typename T>
-    T* GetComponent() {
-        return GetOwner() ? GetOwner()->GetComponent<T>() : nullptr;
-    }
+    T* GetComponent();
+
+    template<typename T>
+    const T* GetComponent() const;
 
     template<typename T, typename... Args>
-    T* AddComponent(Args&&... args) {
-        return GetOwner() ? GetOwner()->AddComponent<T>(std::forward<Args>(args)...) : nullptr;
-    }
+    T* AddComponent(Args&&... args);
+
+    template<typename T>
+    T* GetBehavior();
+
+    template<typename T>
+    const T* GetBehavior() const;
+
+    template<typename T>
+    std::vector<T*> GetBehaviors();
+
+    template<typename T>
+    std::vector<const T*> GetBehaviors() const;
+
+    template<typename T>
+    bool IsBehaviorOfType() const;
 
 private:
     void CacheTransform();
 };
 
-// Example concrete behavior classes
+// Concrete behavior classes can stay in the header since they don't use GameObject methods
 class TestBehavior : public Behavior {
 public:
     void Start() override {
@@ -84,13 +100,12 @@ public:
     }
 
     void OnUpdate(float deltaTime) override {
-        // Example: rotate the object
         if (GetTransform()) {
             GetTransform()->Rotate(0.0f, 45.0f * deltaTime, 0.0f);
         }
     }
 
-    const char* GetTypeName() const override { return "TestBehavior"; }
+    std::string GetDisplayName() const override { return "Test Behavior"; }
 };
 
 class MovementBehavior : public Behavior {
@@ -112,7 +127,10 @@ public:
         }
     }
 
-    const char* GetTypeName() const override { return "MovementBehavior"; }
+    std::string GetDisplayName() const override { return "Movement Behavior"; }
+
+    // DECLARE ONLY - implement in .cpp
+    bool HasConflictingBehaviors() const;
 };
 
 class PlayerController : public Behavior {
@@ -125,27 +143,12 @@ public:
         : moveSpeed(speed), rotationSpeed(rotSpeed) {
     }
 
-    void Start() override {
-        Log("Player controller initialized");
-    }
+    void Start() override;  // Move implementation to .cpp
+    void OnUpdate(float deltaTime) override;  // Move implementation to .cpp
 
-    void OnUpdate(float deltaTime) override {
-        Transform* transform = GetTransform();
-        if (!transform) return;
+    std::string GetDisplayName() const override { return "Player Controller"; }
 
-        // Simple movement (this would normally use input system)
-        // For demo purposes, just move in a pattern
-        static float time = 0.0f;
-        time += deltaTime;
-
-        // Move in a circle
-        float x = std::cos(time) * 0.1f;
-        float z = std::sin(time) * 0.1f;
-        transform->Translate(x, 0.0f, z);
-
-        // Rotate
-        transform->Rotate(0.0f, rotationSpeed * deltaTime, 0.0f);
-    }
-
-    const char* GetTypeName() const override { return "PlayerController"; }
+    // DECLARE ONLY - implement in .cpp
+    std::vector<PlayerController*> FindAllPlayers() const;
+    bool IsMainPlayer() const;
 };

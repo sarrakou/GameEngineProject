@@ -22,3 +22,12 @@ target_compile_features(Engine PUBLIC cxx_std_17)
 # Enable threading support
 find_package(Threads REQUIRED)
 target_link_libraries(Engine PUBLIC Threads::Threads) 
+
+# Enable RTTI
+target_compile_options(Engine PUBLIC 
+    $<$<CXX_COMPILER_ID:MSVC>:/GR>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-frtti>
+)
+
+# Define that RTTI is available
+target_compile_definitions(Engine PUBLIC ENGINE_RTTI_ENABLED)

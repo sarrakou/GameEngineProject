@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <typeinfo>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -20,6 +21,8 @@ private:
 public:
     void Start() override {
         Log("DemoPlayerBehavior started!");
+        // RTTI: Show what type this behavior actually is
+        std::cout << "[RTTI] Behavior type: " << typeid(*this).name() << std::endl;
     }
 
     void OnUpdate(float deltaTime) override {
@@ -39,7 +42,7 @@ public:
         transform->Rotate(0.0f, rotationSpeed * deltaTime, 0.0f);
     }
 
-    const char* GetTypeName() const override { return "DemoPlayerBehavior"; }
+    std::string GetDisplayName() const override { return "Demo Player Behavior"; }
 };
 
 class DemoEnemyBehavior : public Behavior {
@@ -50,6 +53,7 @@ private:
 public:
     void Start() override {
         Log("DemoEnemyBehavior started!");
+        std::cout << "[RTTI] Behavior type: " << typeid(*this).name() << std::endl;
     }
 
     void OnUpdate(float deltaTime) override {
@@ -68,12 +72,15 @@ public:
         transform->SetRotation(0.0f, angle + 90.0f, 0.0f);
     }
 
-    const char* GetTypeName() const override { return "DemoEnemyBehavior"; }
+    std::string GetDisplayName() const override { return "Demo Enemy Behavior"; }
 };
 
 // Demonstration functions
 static void RegisterCustomComponents() {
-    std::cout << "\n=== Registering Custom Components ===" << std::endl;
+    std::cout << "\n=== Registering Custom Components (RTTI Demo) ===" << std::endl;
+
+    std::cout << "[RTTI] Registering DemoPlayerBehavior: " << typeid(DemoPlayerBehavior).name() << std::endl;
+    std::cout << "[RTTI] Registering DemoEnemyBehavior: " << typeid(DemoEnemyBehavior).name() << std::endl;
 
     // Register custom behaviors with the ComponentFactory
     COMPONENT_FACTORY.RegisterComponent<DemoPlayerBehavior>("DemoPlayerBehavior");
@@ -118,6 +125,10 @@ static void PopulateGameScene(Scene* scene) {
     auto* player = ENGINE.CreateGameObjectFromTemplate("AdvancedPlayer");
     std::cout << "Created player: " << (player ? "Success" : "Failed") << std::endl;
 
+    if (player) {
+        std::cout << "[RTTI] Player GameObject type: " << typeid(*player).name() << std::endl;
+    }
+
     // Create multiple enemies using factory batch creation
     GAMEOBJECT_FACTORY.PopulateScene(scene, "AdvancedEnemy", 5);
 
@@ -131,12 +142,43 @@ static void PopulateGameScene(Scene* scene) {
                 auto* transform = collectible->GetComponent<Transform>();
                 if (transform) {
                     transform->SetPosition(static_cast<float>(x), 0.25f, static_cast<float>(z));
+
+                    std::cout << "[RTTI] Transform component type: " << typeid(*transform).name() << std::endl;
                 }
             }
         }
     }
 
     std::cout << "Scene populated with objects!" << std::endl;
+}
+
+static void DemonstrateRTTIComponentSearch() {
+    std::cout << "\n=== RTTI Component Search Demo ===" << std::endl;
+
+    Scene* currentScene = ENGINE.GetCurrentScene();
+    if (!currentScene) return;
+
+    // RTTI: Find all components of specific types using template methods
+    auto transforms = ENGINE.GetAllComponentsOfType<Transform>();
+    auto behaviors = ENGINE.GetAllComponentsOfType<Behavior>();
+
+    std::cout << "[RTTI] Found " << transforms.size() << " Transform components" << std::endl;
+    std::cout << "[RTTI] Found " << behaviors.size() << " Behavior components" << std::endl;
+
+    std::cout << "\n[RTTI] Behavior component types:" << std::endl;
+    for (size_t i = 0; i < behaviors.size() && i < 3; ++i) {
+        if (behaviors[i]) {
+            std::cout << "  " << i << ": " << typeid(*behaviors[i]).name() << std::endl;
+
+            // RTTI: Try dynamic casting to specific behavior types
+            if (dynamic_cast<DemoPlayerBehavior*>(behaviors[i])) {
+                std::cout << "    -> This is a DemoPlayerBehavior!" << std::endl;
+            }
+            else if (dynamic_cast<DemoEnemyBehavior*>(behaviors[i])) {
+                std::cout << "    -> This is a DemoEnemyBehavior!" << std::endl;
+            }
+        }
+    }
 }
 
 static void DemonstrateDataOrientedProcessing() {
@@ -148,6 +190,13 @@ static void DemonstrateDataOrientedProcessing() {
     // Get all transforms for batch processing (REQUIREMENT #3 & #5)
     auto transforms = currentScene->GetAllTransforms();
     std::cout << "Found " << transforms.size() << " transforms for batch processing" << std::endl;
+
+    std::cout << "[RTTI] Transform types in batch:" << std::endl;
+    for (size_t i = 0; i < transforms.size() && i < 3; ++i) {
+        if (transforms[i]) {
+            std::cout << "  " << typeid(*transforms[i]).name() << std::endl;
+        }
+    }
 
     // Demonstrate parallel batch operations
     auto& updateSystem = ENGINE.GetSystemManager().GetUpdateSystem();
@@ -178,11 +227,53 @@ static void PrintRealTimeStats() {
     std::cout << "Total Runtime: " << std::setprecision(1) << stats.totalRunTime << "s" << std::endl;
 }
 
-static void RunEngineDemo() {
-    std::cout << "\n=== GAME ENGINE DEMONSTRATION ===" << std::endl;
-    std::cout << "This demo showcases ALL 5 requirements in action!" << std::endl;
+static void DemonstrateRTTITypeComparison() {
+    std::cout << "\n=== RTTI Type Comparison Demo ===" << std::endl;
 
-    // Configure engine for demonstration
+    // RTTI: Compare engine instance types
+    Engine& engine1 = ENGINE;
+    Engine& engine2 = Engine::GetInstance();
+
+    std::cout << "[RTTI] Engine type comparison:" << std::endl;
+    std::cout << "  Engine1 type: " << typeid(engine1).name() << std::endl;
+    std::cout << "  Engine2 type: " << typeid(engine2).name() << std::endl;
+    std::cout << "  Same type? " << (typeid(engine1) == typeid(engine2) ? "YES" : "NO") << std::endl;
+    std::cout << "  Same instance? " << (&engine1 == &engine2 ? "YES" : "NO") << std::endl;
+
+    // RTTI: Create different component types and compare
+    auto transform = std::make_unique<Transform>();
+    auto playerBehavior = std::make_unique<DemoPlayerBehavior>();
+
+    std::cout << "\n[RTTI] Component type comparison:" << std::endl;
+    std::cout << "  Transform type: " << typeid(*transform).name() << std::endl;
+    std::cout << "  PlayerBehavior type: " << typeid(*playerBehavior).name() << std::endl;
+    std::cout << "  Same type? " << (typeid(*transform) == typeid(*playerBehavior) ? "YES" : "NO") << std::endl;
+
+    // RTTI: Test inheritance hierarchy
+    Component* basePtr1 = transform.get();
+    Component* basePtr2 = playerBehavior.get();
+
+    std::cout << "\n[RTTI] Inheritance testing:" << std::endl;
+    std::cout << "  Transform as Component: " << typeid(*basePtr1).name() << std::endl;
+    std::cout << "  PlayerBehavior as Component: " << typeid(*basePtr2).name() << std::endl;
+
+    // RTTI: dynamic_cast testing
+    if (dynamic_cast<Transform*>(basePtr1)) {
+        std::cout << "  dynamic_cast to Transform: SUCCESS" << std::endl;
+    }
+    if (dynamic_cast<Behavior*>(basePtr2)) {
+        std::cout << "  dynamic_cast to Behavior: SUCCESS" << std::endl;
+    }
+}
+
+static void RunEngineDemo() {
+    std::cout << "\n=== GAME ENGINE DEMO ===" << std::endl;
+
+    Engine& engine = ENGINE;
+    std::cout << "\n[RTTI] Engine type: " << typeid(engine).name() << std::endl;
+    std::cout << "[RTTI] Engine hash: " << typeid(engine).hash_code() << std::endl;
+
+    // Configure engine 
     EngineConfig config;
     config.targetFrameRate = 60.0f;
     config.useMultiThreading = true;
@@ -214,6 +305,12 @@ static void RunEngineDemo() {
     // Populate scene with objects (REQUIREMENT #2: Add/remove objects)
     PopulateGameScene(gameScene);
 
+    // RTTI: Demonstrate type comparison
+    DemonstrateRTTITypeComparison();
+
+    // RTTI: Demonstrate component searching with RTTI
+    DemonstrateRTTIComponentSearch();
+
     // Demonstrate data-oriented processing (REQUIREMENT #3 & #5)
     DemonstrateDataOrientedProcessing();
 
@@ -244,6 +341,11 @@ static void RunEngineDemo() {
         auto collectibles = ENGINE.FindGameObjectsWithTag("Collectible");
         std::cout << "Found " << enemies.size() << " enemies and "
             << collectibles.size() << " collectibles using FindObjectsWithTag!" << std::endl;
+
+        // RTTI: Show first enemy's type if found
+        if (!enemies.empty() && enemies[0]) {
+            std::cout << "[RTTI] First enemy type: " << typeid(*enemies[0]).name() << std::endl;
+        }
     }
 
     // Stop engine
@@ -266,21 +368,21 @@ static void RunEngineDemo() {
     // Shutdown
     ENGINE.Shutdown();
 
-    std::cout << "\n DEMONSTRATION COMPLETE! " << std::endl;
-    std::cout << "All 5 requirements successfully demonstrated:" << std::endl;
-    std::cout << " #1: Zero allocation during main loop (ObjectPools + MemoryManager)" << std::endl;
-    std::cout << " #2: Add/remove objects + FindObjectsWithTag (Scene + SceneManager)" << std::endl;
-    std::cout << " #3: Component architecture + Data-Oriented Design (GameObject + Components + Batch processing)" << std::endl;
-    std::cout << " #4: Factory system + data-driven (ComponentFactory + GameObjectFactory + Templates)" << std::endl;
-    std::cout << " #5: Threading with boss/worker (ThreadPool + UpdateSystem + Parallel updates)" << std::endl;
+    std::cout << "\n DEMO COMPLETE! " << std::endl;
 }
 
 int main() {
     try {
+        // RTTI: Show what we're running
+        std::cout << "[RTTI] Starting main() - type: " << typeid(main).name() << std::endl;
+
         RunEngineDemo();
     }
     catch (const std::exception& e) {
         std::cerr << "Demo failed with exception: " << e.what() << std::endl;
+
+        // RTTI: Show exception type
+        std::cerr << "[RTTI] Exception type: " << typeid(e).name() << std::endl;
         return 1;
     }
 

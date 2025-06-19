@@ -78,7 +78,7 @@ public:
     void RefreshComponentCaches() const;
 
     // GameObject iteration
-    const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const { return objects; }
+    const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
     std::vector<GameObject*> GetActiveGameObjects() const;
 
     // Scene statistics

@@ -21,6 +21,8 @@
 		"commands" : 
 		[
 			"add_library",
+			"target_compile_options",
+			"target_compile_definitions",
 			"target_include_directories",
 			"target_compile_features"
 		],
@@ -42,11 +44,23 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 17,
+				"line" : 27,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
+				"file" : 0,
+				"line" : 33,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 17,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
 				"file" : 0,
 				"line" : 20,
 				"parent" : 0
@@ -60,12 +74,23 @@
 			[
 				{
 					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd"
+				},
+				{
+					"backtrace" : 2,
+					"fragment" : "/GR"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 3,
+					"define" : "ENGINE_RTTI_ENABLED"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"path" : "C:/Users/sarra/source/repos/Engine/GameEngineProject/Engine/include"
 				}
 			],
@@ -74,7 +99,7 @@
 			{
 				"backtraces" : 
 				[
-					3
+					5
 				],
 				"standard" : "17"
 			},

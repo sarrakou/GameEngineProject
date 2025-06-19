@@ -53,6 +53,17 @@
 			[
 				{
 					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd"
+				},
+				{
+					"backtrace" : 2,
+					"fragment" : "/GR"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 2,
+					"define" : "ENGINE_RTTI_ENABLED"
 				}
 			],
 			"includes" : 

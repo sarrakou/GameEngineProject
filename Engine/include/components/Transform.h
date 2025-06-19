@@ -99,7 +99,7 @@ public:
 
     // Component interface
     void Update(float deltaTime) override;
-    const char* GetTypeName() const override { return "Transform"; }
+    std::string GetDisplayName() const override { return "Transform"; }
 
     // Position
     const Vector3& GetPosition() const { return position; }
