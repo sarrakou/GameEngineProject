@@ -1,0 +1,18 @@
+# ninja log v6
+11	118	7720558591709986	Engine/CMakeFiles/Engine.dir/src/components/Component.cpp.obj	57e1ffc68208997c
+20	816	7720558591775516	Engine/CMakeFiles/Engine.dir/src/core/GameObject.cpp.obj	aaf89b93b0e2d226
+14	820	7720558591739981	Engine/CMakeFiles/Engine.dir/src/components/Transform.cpp.obj	638ffa6bb618113d
+8	880	7720558591679145	Engine/CMakeFiles/Engine.dir/src/components/Behavior.cpp.obj	a5dac0a7e9b1021c
+40	917	7720558592000784	Engine/CMakeFiles/Engine.dir/src/memory/ObjectPool.cpp.obj	6958f91dcde2c55f
+27	1056	7720558591865164	Engine/CMakeFiles/Engine.dir/src/core/SceneManager.cpp.obj	807330c19671f62e
+23	1159	7720558591835169	Engine/CMakeFiles/Engine.dir/src/core/Scene.cpp.obj	8705680db6e86cc1
+37	1179	7720558591960786	Engine/CMakeFiles/Engine.dir/src/memory/MemoryManager.cpp.obj	acd25ce8e49e6691
+44	1269	7720558592030780	Engine/CMakeFiles/Engine.dir/src/systems/ComponentManager.cpp.obj	6f654b2510d48423
+34	1290	7720558591928520	Engine/CMakeFiles/Engine.dir/src/factories/GameObjectFactory.cpp.obj	e08aefe4c2de4aae
+30	1333	7720558591881917	Engine/CMakeFiles/Engine.dir/src/factories/ComponentFactory.cpp.obj	d14057365102e9d4
+47	1336	7720558592072708	Engine/CMakeFiles/Engine.dir/src/systems/ThreadPool.cpp.obj	9a582b6d4d4534d5
+51	1431	7720558592102725	Engine/CMakeFiles/Engine.dir/src/systems/UpdateSystem.cpp.obj	f9a22e8b14021fff
+17	1583	7720558591749973	Engine/CMakeFiles/Engine.dir/src/core/Engine.cpp.obj	424f52dc2a93584e
+55	1636	7720558592142703	Game/CMakeFiles/Game.dir/src/main.cpp.obj	fc95ad7dea09c6b5
+1583	1672	7720558607425777	Engine/Engine.lib	9c99be683036a188
+1672	2040	7720558608315815	Game/Game.exe	b862698fab665aee
